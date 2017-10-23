@@ -47,17 +47,17 @@ import org.zuinnote.hadoop.bitcoin.format.mapreduce._
 object SparkScalaBitcoinTransactionGraph {
    def main(args: Array[String]): Unit = {
         val conf = new SparkConf().setAppName("Spark-Scala-Graphx BitcoinTransaction Graph (hadoopcryptoledger)")
-	val sc=new SparkContext(conf)
-	val hadoopConf = new Configuration();
-	 hadoopConf.set("hadoopcryptoledger.bitcoinblockinputformat.filter.magic","F9BEB4D9");
-	jobTop5AddressInput(sc,hadoopConf,args(0),args(1))
-	sc.stop()
+				val sc=new SparkContext(conf)
+				val hadoopConf = new Configuration();
+				 hadoopConf.set("hadoopcryptoledger.bitcoinblockinputformat.filter.magic","F9BEB4D9");
+				jobTop5AddressInput(sc,hadoopConf,args(0),args(1))
+				sc.stop()
       }
 
  def jobTop5AddressInput(sc: SparkContext, hadoopConf: Configuration, inputFile: String, outputFile: String): Unit = {
-val bitcoinBlocksRDD = sc.newAPIHadoopFile(inputFile, classOf[BitcoinBlockFileInputFormat], classOf[BytesWritable], classOf[BitcoinBlock],hadoopConf)
+	val bitcoinBlocksRDD = sc.newAPIHadoopFile(inputFile, classOf[BitcoinBlockFileInputFormat], classOf[BytesWritable], classOf[BitcoinBlock],hadoopConf)
 	// extract a tuple per transaction containing Bitcoin destination address, the input transaction hash, the input transaction output index, and the current transaction hash, the current transaction output index, a (generated) long identifier
-   	val bitcoinTransactionTuples = bitcoinBlocksRDD.flatMap(hadoopKeyValueTuple => extractTransactionData(hadoopKeyValueTuple._2))
+  val bitcoinTransactionTuples = bitcoinBlocksRDD.flatMap(hadoopKeyValueTuple => extractTransactionData(hadoopKeyValueTuple._2))
 	// create the vertex (vertexId, Bitcoin destination address), keep in mind that the flat table contains the same bitcoin address several times
 	val bitcoinAddressIndexed = bitcoinTransactionTuples.map(bitcoinTransactions =>bitcoinTransactions._1).distinct().zipWithIndex()
 	// create the edges. Basically we need to determine which inputVertexId refers to which outputVertex Id. 
